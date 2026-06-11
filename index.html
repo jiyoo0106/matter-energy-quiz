@@ -4,131 +4,106 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>물질과 에너지 퀴즈</title>
-</head>
-<body>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;color:#111}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;background:#f8f9fa;color:#111;min-height:100vh}
 #app{padding:1rem;max-width:680px;margin:0 auto;width:100%}
 .screen{display:none}
 .screen.active{display:block}
 
 .header{margin-bottom:1.5rem}
-.header h1{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
-.header p{font-size:14px;color:var(--color-text-secondary)}
+.header h1{font-size:20px;font-weight:600;color:#111;margin-bottom:4px}
+.header p{font-size:14px;color:#666}
 
-.progress-bar-wrap{background:var(--color-border-tertiary);border-radius:4px;height:6px;margin-bottom:1.5rem}
+.progress-bar-wrap{background:#e9ecef;border-radius:4px;height:6px;margin-bottom:1.5rem}
 .progress-bar-fill{height:6px;border-radius:4px;background:#1D9E75;transition:width 0.3s}
 
 .q-meta{display:flex;gap:8px;align-items:center;margin-bottom:12px}
-.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.badge{font-size:12px;padding:4px 10px;border-radius:20px;font-weight:600}
 .badge-ox{background:#E1F5EE;color:#0F6E56}
 .badge-mc{background:#E6F1FB;color:#185FA5}
 .badge-sa{background:#FAEEDA;color:#854F0B}
-.q-num{font-size:13px;color:var(--color-text-secondary)}
+.q-num{font-size:13px;color:#666}
 
-.q-text{font-size:16px;font-weight:500;color:var(--color-text-primary);line-height:1.6;margin-bottom:1.25rem}
+.q-text{font-size:16px;font-weight:500;color:#111;line-height:1.7;margin-bottom:1.25rem;white-space:pre-wrap;word-break:keep-all}
 
-.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
-.choice{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:12px 16px;font-size:14px;color:var(--color-text-primary);cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s;line-height:1.5}
-.choice:hover:not(:disabled){background:var(--color-background-secondary);border-color:var(--color-border-primary)}
-.choice.correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.choices{display:flex;flex-direction:column;gap:10px;margin-bottom:1rem}
+.choice{background:#fff;border:1.5px solid #dee2e6;border-radius:10px;padding:14px 16px;font-size:15px;color:#111;cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s;line-height:1.6;word-break:keep-all}
+.choice:hover:not(:disabled){background:#f1f3f5;border-color:#adb5bd}
+.choice.correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;font-weight:600}
 .choice.wrong{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
-.choice.reveal-correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.choice.reveal-correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;font-weight:600}
 .choice:disabled{cursor:default}
 
 .ox-btns{display:flex;gap:12px;margin-bottom:1rem}
-.ox-btn{flex:1;padding:14px;font-size:20px;font-weight:500;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:pointer;color:var(--color-text-primary);transition:all 0.15s}
-.ox-btn:hover:not(:disabled){background:var(--color-background-secondary)}
+.ox-btn{flex:1;padding:18px;font-size:28px;font-weight:700;border:1.5px solid #dee2e6;border-radius:10px;background:#fff;cursor:pointer;color:#111;transition:all 0.15s}
+.ox-btn:hover:not(:disabled){background:#f1f3f5}
 .ox-btn.correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
 .ox-btn.wrong{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
 .ox-btn.reveal-correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
 .ox-btn:disabled{cursor:default}
 
 .sa-wrap{margin-bottom:1rem}
-.sa-wrap input{width:100%;padding:12px 14px;font-size:14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
-.sa-wrap input:focus{outline:none;border-color:#1D9E75}
-.sa-hint{font-size:12px;color:var(--color-text-secondary);margin-top:6px}
+.sa-wrap input{width:100%;padding:14px 16px;font-size:16px;border:1.5px solid #dee2e6;border-radius:10px;background:#fff;color:#111;outline:none}
+.sa-wrap input:focus{border-color:#1D9E75}
+.sa-hint{font-size:13px;color:#888;margin-top:6px}
 
-.explanation{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border-left:3px solid #1D9E75;padding:14px 16px;margin-bottom:1.25rem;display:none}
+.explanation{background:#f8f9fa;border-radius:10px;border-left:4px solid #1D9E75;padding:14px 16px;margin-bottom:1.25rem;display:none}
 .explanation.show{display:block}
-.explanation .ex-label{font-size:11px;font-weight:500;color:#0F6E56;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
-.explanation p{font-size:13px;color:var(--color-text-secondary);line-height:1.7}
-.explanation .ans-line{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.explanation .ex-label{font-size:12px;font-weight:700;color:#0F6E56;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
+.explanation p{font-size:14px;color:#444;line-height:1.8;white-space:pre-wrap;word-break:keep-all}
+.explanation .ans-line{font-size:14px;font-weight:700;color:#111;margin-bottom:8px}
 
-.result-badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding:6px 12px;border-radius:20px;margin-bottom:1rem}
+.result-badge{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;padding:8px 14px;border-radius:20px;margin-bottom:1rem}
 .result-badge.correct-badge{background:#E1F5EE;color:#0F6E56}
 .result-badge.wrong-badge{background:#FCEBEB;color:#A32D2D}
 
-.btn-next{width:100%;padding:13px;font-size:14px;font-weight:500;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--color-text-primary);transition:all 0.15s;display:none}
+.btn-next{width:100%;padding:15px;font-size:16px;font-weight:600;background:#fff;border:1.5px solid #dee2e6;border-radius:10px;cursor:pointer;color:#111;transition:all 0.15s;display:none}
 .btn-next.show{display:block}
-.btn-next:hover{background:var(--color-background-secondary)}
+.btn-next:hover{background:#f1f3f5}
 
-.btn-submit{width:100%;padding:13px;font-size:14px;font-weight:500;background:#1D9E75;border:none;border-radius:var(--border-radius-md);cursor:pointer;color:#fff;display:none}
+.btn-submit{width:100%;padding:15px;font-size:16px;font-weight:600;background:#1D9E75;border:none;border-radius:10px;cursor:pointer;color:#fff;display:none}
 .btn-submit.show{display:block}
 .btn-submit:hover{background:#0F6E56}
 
-.score-card{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:2rem;text-align:center;margin-bottom:1.5rem}
-.score-big{font-size:48px;font-weight:500;color:#1D9E75;line-height:1}
-.score-sub{font-size:14px;color:var(--color-text-secondary);margin-top:8px}
-.score-msg{font-size:15px;color:var(--color-text-primary);margin-top:16px;font-weight:500}
+.score-card{background:#fff;border-radius:14px;border:1px solid #dee2e6;padding:2rem;text-align:center;margin-bottom:1.5rem}
+.score-big{font-size:56px;font-weight:700;color:#1D9E75;line-height:1}
+.score-sub{font-size:15px;color:#666;margin-top:8px}
+.score-msg{font-size:16px;color:#111;margin-top:16px;font-weight:600}
 
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
-.stat-cell{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;text-align:center}
-.stat-n{font-size:22px;font-weight:500;color:var(--color-text-primary)}
-.stat-l{font-size:12px;color:var(--color-text-secondary);margin-top:4px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.stat-cell{background:#fff;border-radius:10px;border:1px solid #dee2e6;padding:1rem;text-align:center}
+.stat-n{font-size:22px;font-weight:700;color:#111}
+.stat-l{font-size:13px;color:#666;margin-top:4px}
 
 .review-list{display:flex;flex-direction:column;gap:12px;margin-bottom:1.5rem}
-.review-item{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px 16px}
-.review-item .ri-q{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;line-height:1.5}
-.review-item .ri-ans{font-size:12px;color:#A32D2D;margin-bottom:2px}
-.review-item .ri-correct{font-size:12px;color:#0F6E56;margin-bottom:6px}
-.review-item .ri-ex{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.review-item{background:#fff;border-radius:10px;border:1px solid #dee2e6;padding:14px 16px}
+.review-item .ri-q{font-size:14px;font-weight:600;color:#111;margin-bottom:8px;line-height:1.6;white-space:pre-wrap;word-break:keep-all}
+.review-item .ri-ans{font-size:13px;color:#A32D2D;margin-bottom:2px}
+.review-item .ri-correct{font-size:13px;color:#0F6E56;font-weight:600;margin-bottom:8px}
+.review-item .ri-ex{font-size:13px;color:#555;line-height:1.7;white-space:pre-wrap;word-break:keep-all}
 
-.btn-restart{width:100%;padding:13px;font-size:14px;font-weight:500;background:#1D9E75;border:none;border-radius:var(--border-radius-md);cursor:pointer;color:#fff}
+.btn-restart{width:100%;padding:15px;font-size:16px;font-weight:600;background:#1D9E75;border:none;border-radius:10px;cursor:pointer;color:#fff}
 .btn-restart:hover{background:#0F6E56}
 
-.start-card{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:2rem;margin-bottom:1.5rem}
-.start-card h2{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px}
-.start-card p{font-size:14px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:8px}
+.start-card{background:#fff;border-radius:14px;border:1px solid #dee2e6;padding:2rem;margin-bottom:1.5rem}
+.start-card h2{font-size:18px;font-weight:700;color:#111;margin-bottom:12px}
+.start-card p{font-size:15px;color:#555;line-height:1.8;margin-bottom:8px;word-break:keep-all}
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
-.info-cell{background:var(--color-background-primary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:12px;text-align:center}
-.info-n{font-size:20px;font-weight:500;color:var(--color-text-primary)}
-.info-l{font-size:11px;color:var(--color-text-secondary);margin-top:3px}
-.btn-start{width:100%;padding:14px;font-size:15px;font-weight:500;background:#1D9E75;border:none;border-radius:var(--border-radius-md);cursor:pointer;color:#fff;margin-top:1.5rem}
+.info-cell{background:#f8f9fa;border-radius:10px;border:1px solid #dee2e6;padding:14px;text-align:center}
+.info-n{font-size:22px;font-weight:700;color:#111}
+.info-l{font-size:12px;color:#666;margin-top:4px}
+.btn-start{width:100%;padding:16px;font-size:16px;font-weight:600;background:#1D9E75;border:none;border-radius:10px;cursor:pointer;color:#fff;margin-top:1.5rem}
 .btn-start:hover{background:#0F6E56}
 
-.section-divider{font-size:12px;color:var(--color-text-secondary);text-align:center;margin:1rem 0;letter-spacing:0.05em}
+.wrong-only-header{margin-bottom:1rem}
+.wrong-only-header h2{font-size:17px;font-weight:700;color:#111}
 
-.wrong-only-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.wrong-only-header h2{font-size:16px;font-weight:500;color:var(--color-text-primary)}
-
-@media(prefers-color-scheme:dark){
-  .badge-ox{background:#085041;color:#9FE1CB}
-  .badge-mc{background:#0C447C;color:#B5D4F4}
-  .badge-sa{background:#633806;color:#FAC775}
-}
-
-@media(max-width:480px){
-  .header h1{font-size:18px}
-  .q-text{font-size:16px}
-  .choice{font-size:15px;padding:14px 16px}
-  .ox-btn{font-size:24px;padding:18px}
-  .score-big{font-size:52px}
-  .score-msg{font-size:15px}
-  .stats-grid{grid-template-columns:repeat(3,1fr);gap:8px}
-  .stat-n{font-size:20px}
-  .info-grid{grid-template-columns:repeat(3,1fr)}
-  .btn-start,.btn-restart,.btn-next,.btn-submit{font-size:16px;padding:15px}
-  .start-card{padding:1.5rem}
-  .score-card{padding:1.5rem}
-  .review-item .ri-q{font-size:14px}
-  .review-item .ri-ex{font-size:13px}
-}
+.sa-submit-btn{width:100%;padding:14px;font-size:16px;font-weight:600;background:#1D9E75;border:none;border-radius:10px;cursor:pointer;color:#fff;margin-bottom:1rem}
+.sa-submit-btn:hover{background:#0F6E56}
 </style>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+</head>
+<body>
 <div id="app">
   <div id="start-screen" class="screen active">
     <div class="header">
@@ -193,6 +168,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const dbClient = supabase.createClient(
   'https://ueneqrdmvrwhwbhmkmgg.supabase.co',
@@ -327,7 +303,7 @@ const ALL_QUESTIONS = [
     ],
     correct:2,
     answerLine:'정답: ③  0.1 M',
-    explanation:'1차 반응에서 반감기마다 농도가 절반씩 감소합니다.\n30분 = 반감기(10분) × 3회\n0.8 M → (1회, 10분 후) 0.4 M → (2회, 20분 후) 0.2 M → (3회, 30분 후) 0.1 M\n따라서 30분 후 농도는 0.1 M입니다.'
+    explanation:'1차 반응에서 반감기마다 농도가 절반씩 감소합니다.\n30분 = 반감기(10분) × 3회\n0.8 M → (10분 후) 0.4 M → (20분 후) 0.2 M → (30분 후) 0.1 M\n따라서 30분 후 농도는 0.1 M입니다.'
   },
   {
     id:13, type:'mc', unit:'4단원', sub:'유효 충돌과 활성화 에너지',
@@ -409,7 +385,7 @@ const ALL_QUESTIONS = [
     answer:'80분',
     keywords:['80'],
     answerLine:'정답: 80분',
-    explanation:'1차 반응에서 반감기마다 농도가 절반씩 감소합니다.\n1.6 M → (20분) → 0.8 M → (40분) → 0.4 M → (60분) → 0.2 M → (80분) → 0.1 M\n실제로는 4번의 반감기(= 80분)가 필요합니다.\n1.6 × (½)⁴ = 1.6/16 = 0.1 M → 20분 × 4 = 80분\n따라서 정답은 80분입니다.'
+    explanation:'1차 반응에서 반감기마다 농도가 절반씩 감소합니다.\n1.6 M → (20분) → 0.8 M → (40분) → 0.4 M → (60분) → 0.2 M → (80분) → 0.1 M\n4번의 반감기 = 20분 × 4 = 80분\n따라서 정답은 80분입니다.'
   },
   {
     id:20, type:'sa', unit:'4단원', sub:'유효 충돌과 활성화 에너지',
@@ -454,6 +430,7 @@ function startQuiz(){
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
 }
 
 function renderQuestion(){
@@ -518,19 +495,9 @@ function renderQuestion(){
     body.appendChild(wrap);
 
     const subBtn = document.createElement('button');
-    subBtn.className = 'btn-submit show';
+    subBtn.className = 'sa-submit-btn';
     subBtn.id = 'sa-submit';
     subBtn.textContent = '답안 제출';
-    subBtn.style.background='#1D9E75';
-    subBtn.style.color='#fff';
-    subBtn.style.border='none';
-    subBtn.style.borderRadius='var(--border-radius-md)';
-    subBtn.style.padding='12px';
-    subBtn.style.width='100%';
-    subBtn.style.fontSize='14px';
-    subBtn.style.fontWeight='500';
-    subBtn.style.cursor='pointer';
-    subBtn.style.marginBottom='1rem';
     subBtn.onclick = ()=>handleSA();
     body.appendChild(subBtn);
 
@@ -590,13 +557,12 @@ function showFeedback(isCorrect, q){
   document.getElementById('ans-line').textContent = q.answerLine;
   document.getElementById('ex-text').textContent = q.explanation;
   ex.className = 'explanation show';
-  if(isCorrect) ex.style.borderLeftColor='#1D9E75';
-  else ex.style.borderLeftColor='#E24B4A';
+  ex.style.borderLeftColor = isCorrect ? '#1D9E75' : '#E24B4A';
 
   const rb = document.getElementById('result-badge-wrap');
   rb.innerHTML = isCorrect
-    ? '<div class="result-badge correct-badge"><i class="ti ti-check" aria-hidden="true"></i> 정답입니다!</div>'
-    : '<div class="result-badge wrong-badge"><i class="ti ti-x" aria-hidden="true"></i> 오답입니다</div>';
+    ? '<div class="result-badge correct-badge">✓ 정답입니다!</div>'
+    : '<div class="result-badge wrong-badge">✗ 오답입니다</div>';
 }
 
 function showNextBtn(){
@@ -642,7 +608,7 @@ function submitQuiz(){
   const wrong = answers.filter(a=>!a.isCorrect);
   const rl = document.getElementById('review-list');
   if(wrong.length===0){
-    rl.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--color-text-secondary);font-size:14px">틀린 문제가 없어요! 완벽합니다 🎉</div>';
+    rl.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#888;font-size:15px">틀린 문제가 없어요! 완벽합니다 🎉</div>';
   } else {
     rl.innerHTML = wrong.map(a=>`
       <div class="review-item">
