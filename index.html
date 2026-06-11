@@ -103,6 +103,8 @@ body{font-family:var(--font-sans)}
 }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <div id="app">
   <div id="start-screen" class="screen active">
     <div class="header">
@@ -168,6 +170,11 @@ body{font-family:var(--font-sans)}
 </div>
 
 <script>
+const dbClient = supabase.createClient(
+  'https://ueneqrdmvrwhwbhmkmgg.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVlbmVxcmRtdnJ3aHdiaG1rbWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNTY5NzIsImV4cCI6MjA5NjczMjk3Mn0.NyIr49fkLNeMdrxXUghMmsibPIjSAn6DVQGFmaT4gN0'
+);
+
 const ALL_QUESTIONS = [
   // ───── O/X (6문제) ─────
   {
@@ -622,6 +629,18 @@ function submitQuiz(){
       </div>
     `).join('');
   }
+
+  dbClient.from('quiz_results').insert({
+    total_questions: total,
+    correct_answers: correct,
+    score_pct: pct,
+    ox_correct: oxA.filter(a=>a.isCorrect).length,
+    ox_total: oxA.length,
+    mc_correct: mcA.filter(a=>a.isCorrect).length,
+    mc_total: mcA.length,
+    sa_correct: saA.filter(a=>a.isCorrect).length,
+    sa_total: saA.length
+  });
 
   showScreen('result-screen');
 }
