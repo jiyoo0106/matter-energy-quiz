@@ -1,0 +1,632 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+#app{padding:1rem 0;max-width:680px}
+.screen{display:none}
+.screen.active{display:block}
+
+.header{margin-bottom:1.5rem}
+.header h1{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.header p{font-size:14px;color:var(--color-text-secondary)}
+
+.progress-bar-wrap{background:var(--color-border-tertiary);border-radius:4px;height:6px;margin-bottom:1.5rem}
+.progress-bar-fill{height:6px;border-radius:4px;background:#1D9E75;transition:width 0.3s}
+
+.q-meta{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.badge-ox{background:#E1F5EE;color:#0F6E56}
+.badge-mc{background:#E6F1FB;color:#185FA5}
+.badge-sa{background:#FAEEDA;color:#854F0B}
+.q-num{font-size:13px;color:var(--color-text-secondary)}
+
+.q-text{font-size:16px;font-weight:500;color:var(--color-text-primary);line-height:1.6;margin-bottom:1.25rem}
+
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.choice{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:12px 16px;font-size:14px;color:var(--color-text-primary);cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s;line-height:1.5}
+.choice:hover:not(:disabled){background:var(--color-background-secondary);border-color:var(--color-border-primary)}
+.choice.correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.choice.wrong{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
+.choice.reveal-correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.choice:disabled{cursor:default}
+
+.ox-btns{display:flex;gap:12px;margin-bottom:1rem}
+.ox-btn{flex:1;padding:14px;font-size:20px;font-weight:500;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:pointer;color:var(--color-text-primary);transition:all 0.15s}
+.ox-btn:hover:not(:disabled){background:var(--color-background-secondary)}
+.ox-btn.correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.ox-btn.wrong{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
+.ox-btn.reveal-correct{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.ox-btn:disabled{cursor:default}
+
+.sa-wrap{margin-bottom:1rem}
+.sa-wrap input{width:100%;padding:12px 14px;font-size:14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
+.sa-wrap input:focus{outline:none;border-color:#1D9E75}
+.sa-hint{font-size:12px;color:var(--color-text-secondary);margin-top:6px}
+
+.explanation{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border-left:3px solid #1D9E75;padding:14px 16px;margin-bottom:1.25rem;display:none}
+.explanation.show{display:block}
+.explanation .ex-label{font-size:11px;font-weight:500;color:#0F6E56;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
+.explanation p{font-size:13px;color:var(--color-text-secondary);line-height:1.7}
+.explanation .ans-line{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+
+.result-badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding:6px 12px;border-radius:20px;margin-bottom:1rem}
+.result-badge.correct-badge{background:#E1F5EE;color:#0F6E56}
+.result-badge.wrong-badge{background:#FCEBEB;color:#A32D2D}
+
+.btn-next{width:100%;padding:13px;font-size:14px;font-weight:500;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--color-text-primary);transition:all 0.15s;display:none}
+.btn-next.show{display:block}
+.btn-next:hover{background:var(--color-background-secondary)}
+
+.btn-submit{width:100%;padding:13px;font-size:14px;font-weight:500;background:#1D9E75;border:none;border-radius:var(--border-radius-md);cursor:pointer;color:#fff;display:none}
+.btn-submit.show{display:block}
+.btn-submit:hover{background:#0F6E56}
+
+.score-card{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:2rem;text-align:center;margin-bottom:1.5rem}
+.score-big{font-size:48px;font-weight:500;color:#1D9E75;line-height:1}
+.score-sub{font-size:14px;color:var(--color-text-secondary);margin-top:8px}
+.score-msg{font-size:15px;color:var(--color-text-primary);margin-top:16px;font-weight:500}
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.stat-cell{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;text-align:center}
+.stat-n{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.stat-l{font-size:12px;color:var(--color-text-secondary);margin-top:4px}
+
+.review-list{display:flex;flex-direction:column;gap:12px;margin-bottom:1.5rem}
+.review-item{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px 16px}
+.review-item .ri-q{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;line-height:1.5}
+.review-item .ri-ans{font-size:12px;color:#A32D2D;margin-bottom:2px}
+.review-item .ri-correct{font-size:12px;color:#0F6E56;margin-bottom:6px}
+.review-item .ri-ex{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+
+.btn-restart{width:100%;padding:13px;font-size:14px;font-weight:500;background:#1D9E75;border:none;border-radius:var(--border-radius-md);cursor:pointer;color:#fff}
+.btn-restart:hover{background:#0F6E56}
+
+.start-card{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:2rem;margin-bottom:1.5rem}
+.start-card h2{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px}
+.start-card p{font-size:14px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:8px}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.info-cell{background:var(--color-background-primary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:12px;text-align:center}
+.info-n{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.info-l{font-size:11px;color:var(--color-text-secondary);margin-top:3px}
+.btn-start{width:100%;padding:14px;font-size:15px;font-weight:500;background:#1D9E75;border:none;border-radius:var(--border-radius-md);cursor:pointer;color:#fff;margin-top:1.5rem}
+.btn-start:hover{background:#0F6E56}
+
+.section-divider{font-size:12px;color:var(--color-text-secondary);text-align:center;margin:1rem 0;letter-spacing:0.05em}
+
+.wrong-only-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.wrong-only-header h2{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+
+@media(prefers-color-scheme:dark){
+  .badge-ox{background:#085041;color:#9FE1CB}
+  .badge-mc{background:#0C447C;color:#B5D4F4}
+  .badge-sa{background:#633806;color:#FAC775}
+}
+</style>
+
+<div id="app">
+  <div id="start-screen" class="screen active">
+    <div class="header">
+      <h1>물질과 에너지 퀴즈</h1>
+      <p>미래엔 2022 개정 교육과정 · 3단원 + 4단원</p>
+    </div>
+    <div class="start-card">
+      <h2>시작 전 안내</h2>
+      <p>3단원 <strong>화학 변화의 자발성</strong>과 4단원 <strong>반응 속도</strong> 범위의 문제입니다.</p>
+      <p>문제를 풀고 나면 즉시 정·오답 여부와 해설을 확인할 수 있어요. 마지막에는 틀린 문제만 모아서 복습할 수 있습니다.</p>
+      <div class="info-grid">
+        <div class="info-cell"><div class="info-n">6</div><div class="info-l">O/X 퀴즈</div></div>
+        <div class="info-cell"><div class="info-n">10</div><div class="info-l">객관식</div></div>
+        <div class="info-cell"><div class="info-n">5</div><div class="info-l">단답형</div></div>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">퀴즈 시작하기</button>
+    </div>
+  </div>
+
+  <div id="quiz-screen" class="screen">
+    <div class="header">
+      <h1>물질과 에너지 퀴즈</h1>
+      <p id="unit-label"></p>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="q-meta">
+      <span class="badge" id="type-badge"></span>
+      <span class="q-num" id="q-num-label"></span>
+    </div>
+    <div class="q-text" id="q-text"></div>
+    <div id="q-body"></div>
+    <div class="explanation" id="explanation">
+      <div class="ex-label">해설</div>
+      <div class="ans-line" id="ans-line"></div>
+      <p id="ex-text"></p>
+    </div>
+    <div id="result-badge-wrap"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">다음 문제 →</button>
+    <button class="btn-submit" id="btn-submit" onclick="submitQuiz()">결과 보기 →</button>
+  </div>
+
+  <div id="result-screen" class="screen">
+    <div class="header">
+      <h1>결과</h1>
+      <p>퀴즈를 모두 완료했어요</p>
+    </div>
+    <div class="score-card">
+      <div class="score-big" id="score-pct"></div>
+      <div class="score-sub" id="score-detail"></div>
+      <div class="score-msg" id="score-msg"></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-cell"><div class="stat-n" id="stat-ox"></div><div class="stat-l">O/X</div></div>
+      <div class="stat-cell"><div class="stat-n" id="stat-mc"></div><div class="stat-l">객관식</div></div>
+      <div class="stat-cell"><div class="stat-n" id="stat-sa"></div><div class="stat-l">단답형</div></div>
+    </div>
+    <div class="wrong-only-header">
+      <h2>오답 복습</h2>
+    </div>
+    <div class="review-list" id="review-list"></div>
+    <button class="btn-restart" onclick="restartQuiz()">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // ───── O/X (6문제) ─────
+  {
+    id:1, type:'ox', unit:'3단원', sub:'화학 변화의 자발성',
+    q:'발열 반응은 항상 자발적으로 일어난다.',
+    correct:'X',
+    answerLine:'정답: X (틀렸습니다)',
+    explanation:'발열 반응(ΔH < 0)은 자발적 반응에 유리하지만, 자발성은 엔탈피 변화와 엔트로피 변화를 함께 고려해야 합니다. 엔트로피가 크게 감소(ΔS < 0)하는 경우에는 발열 반응이라도 비자발적일 수 있습니다. 자발성은 엔탈피와 엔트로피 변화의 방향을 종합하여 판단합니다.'
+  },
+  {
+    id:2, type:'ox', unit:'3단원', sub:'반응 경로와 반응 엔탈피',
+    q:'헤스 법칙에 따르면, 화학 반응의 전체 엔탈피 변화는 반응 경로에 관계없이 일정하다.',
+    correct:'O',
+    answerLine:'정답: O (맞습니다)',
+    explanation:'헤스 법칙은 에너지 보존 법칙에 근거합니다. 반응물과 생성물이 동일하다면, 반응이 한 단계로 진행되든 여러 단계로 진행되든 전체 엔탈피 변화(ΔH)는 항상 같습니다. 이 법칙 덕분에 직접 측정하기 어려운 반응의 엔탈피를 여러 반응의 조합으로 계산할 수 있습니다.'
+  },
+  {
+    id:3, type:'ox', unit:'3단원', sub:'화학 변화의 자발성',
+    q:'자발적 변화에서는 언제나 엔트로피가 증가한다.',
+    correct:'X',
+    answerLine:'정답: X (틀렸습니다)',
+    explanation:'자발적 변화라고 해서 반드시 엔트로피가 증가하는 것은 아닙니다. 예를 들어 물이 0 °C 이하에서 어는 현상(엔트로피 감소)은 자발적입니다. 자발성은 엔트로피 변화만으로 결정되지 않으며, 엔탈피 변화(ΔH)와 엔트로피 변화(ΔS)를 함께 고려해야 합니다.'
+  },
+  {
+    id:4, type:'ox', unit:'4단원', sub:'일차 반응의 반감기',
+    q:'1차 반응에서 반감기는 반응물의 초기 농도와 무관하게 일정하다.',
+    correct:'O',
+    answerLine:'정답: O (맞습니다)',
+    explanation:'1차 반응의 반감기(t½)는 반응물의 초기 농도에 의존하지 않고, 오직 반응 속도 상수(k)에 의해서만 결정됩니다. 따라서 반응물의 농도가 절반으로 줄어드는 데 걸리는 시간은 초기 농도에 상관없이 항상 같습니다. 이는 1차 반응의 중요한 특징입니다.'
+  },
+  {
+    id:5, type:'ox', unit:'4단원', sub:'유효 충돌과 활성화 에너지',
+    q:'촉매는 활성화 에너지를 낮추어 반응 속도를 빠르게 하지만, 반응 엔탈피(ΔH)는 변화시키지 않는다.',
+    correct:'O',
+    answerLine:'정답: O (맞습니다)',
+    explanation:'촉매는 반응이 진행될 수 있는 새로운 경로(활성화 에너지가 더 낮은 경로)를 제공하여 반응 속도를 증가시킵니다. 그러나 반응물과 생성물 자체가 달라지는 것이 아니므로, 반응 전후의 에너지 차이인 반응 엔탈피(ΔH)는 촉매가 있을 때와 없을 때 동일합니다.'
+  },
+  {
+    id:6, type:'ox', unit:'4단원', sub:'화학 반응 속도',
+    q:'반응 속도식에서 각 반응물의 반응 차수는 반드시 화학 반응식의 계수와 같다.',
+    correct:'X',
+    answerLine:'정답: X (틀렸습니다)',
+    explanation:'반응 차수는 화학 반응식의 계수로부터 이론적으로 결정되는 것이 아니라, 실험을 통해 측정한 데이터에서 결정됩니다. 화학 반응식의 계수와 반응 차수가 우연히 같은 경우도 있지만, 반드시 일치하지는 않습니다. 반응 속도식은 반드시 실험으로 구해야 합니다.'
+  },
+
+  // ───── 객관식 (10문제) ─────
+  {
+    id:7, type:'mc', unit:'3단원', sub:'화학 반응과 엔탈피',
+    q:'다음 열화학 반응식에 대한 설명으로 옳은 것은?\n\nC(s) + O₂(g) → CO₂(g)  ΔH = −394 kJ/mol',
+    choices:[
+      '① 이 반응은 흡열 반응이다.',
+      '② CO₂ 1 mol이 생성될 때 394 kJ의 열을 흡수한다.',
+      '③ 이 반응에서 반응물의 엔탈피 합이 생성물의 엔탈피 합보다 크다.',
+      '④ ΔH의 값은 반응물과 생성물의 상태와 무관하다.',
+      '⑤ 역반응의 ΔH는 −394 kJ/mol이다.'
+    ],
+    correct:2,
+    answerLine:'정답: ③',
+    explanation:'ΔH < 0이면 발열 반응으로, 반응이 진행될 때 계(반응물+생성물)의 에너지가 방출됩니다. 반응물의 엔탈피 합이 생성물의 엔탈피 합보다 크기 때문에 그 차이만큼 열이 방출됩니다. ①은 틀렸습니다(발열 반응). ②는 틀렸습니다(열을 방출합니다). ④는 틀렸습니다(물질의 상태에 따라 엔탈피가 달라집니다). ⑤는 틀렸습니다(역반응의 ΔH = +394 kJ/mol입니다).'
+  },
+  {
+    id:8, type:'mc', unit:'3단원', sub:'반응 경로와 반응 엔탈피',
+    q:'다음 두 반응의 엔탈피가 주어졌을 때, 헤스 법칙을 이용하여 반응 ③의 ΔH를 구하면?\n\n① C(s) + O₂(g) → CO₂(g)         ΔH₁ = −394 kJ/mol\n② CO(g) + ½O₂(g) → CO₂(g)    ΔH₂ = −283 kJ/mol\n③ C(s) + ½O₂(g) → CO(g)         ΔH₃ = ?',
+    choices:[
+      '① −677 kJ/mol',
+      '② −111 kJ/mol',
+      '③ +111 kJ/mol',
+      '④ −283 kJ/mol',
+      '⑤ +283 kJ/mol'
+    ],
+    correct:1,
+    answerLine:'정답: ②  ΔH₃ = −111 kJ/mol',
+    explanation:'헤스 법칙을 적용합니다. 반응 ③은 반응 ①에서 반응 ②를 빼면 됩니다.\n반응 ③ = 반응 ① − 반응 ②\nΔH₃ = ΔH₁ − ΔH₂ = (−394) − (−283) = −394 + 283 = −111 kJ/mol\n즉, C(s)가 CO(g)로 산화될 때 111 kJ/mol의 열이 방출됩니다.'
+  },
+  {
+    id:9, type:'mc', unit:'3단원', sub:'화학 변화의 자발성',
+    q:'다음 중 엔트로피(S)가 증가하는 변화로만 묶인 것은?',
+    choices:[
+      '① 물의 증발, 기체의 압축',
+      '② 설탕의 용해, 기체 분자 수가 증가하는 반응',
+      '③ 드라이아이스의 승화, 기체의 액화',
+      '④ 물의 응고, 설탕의 용해',
+      '⑤ 기체의 압축, 기체의 액화'
+    ],
+    correct:1,
+    answerLine:'정답: ②',
+    explanation:'엔트로피는 물질의 무질서한 정도를 나타냅니다. 설탕이 물에 용해되면 입자가 더 무질서하게 퍼지므로 엔트로피가 증가하고, 화학 반응에서 기체 분자 수가 증가하면 입자의 배열 가짓수가 늘어나 엔트로피가 증가합니다. ①의 기체 압축, ③의 기체 액화, ④의 물 응고, ⑤의 기체 압축·액화는 모두 엔트로피가 감소하는 변화입니다.'
+  },
+  {
+    id:10, type:'mc', unit:'3단원', sub:'화학 변화의 자발성',
+    q:'엔탈피 변화(ΔH)와 엔트로피 변화(ΔS)의 부호 조합에 따른 반응의 자발성에 대한 설명으로 옳은 것은?',
+    choices:[
+      '① ΔH < 0, ΔS > 0이면 모든 온도에서 비자발적이다.',
+      '② ΔH > 0, ΔS < 0이면 모든 온도에서 자발적이다.',
+      '③ ΔH < 0, ΔS < 0이면 모든 온도에서 자발적이다.',
+      '④ ΔH > 0, ΔS > 0이면 모든 온도에서 비자발적이다.',
+      '⑤ ΔH < 0, ΔS > 0이면 모든 온도에서 자발적이다.'
+    ],
+    correct:4,
+    answerLine:'정답: ⑤',
+    explanation:'ΔH < 0(발열)이고 ΔS > 0(엔트로피 증가)이면, 엔탈피와 엔트로피 두 요인 모두 자발적 방향을 가리키므로 온도에 관계없이 항상 자발적입니다. ①은 틀렸습니다(모든 온도에서 자발적). ②는 틀렸습니다(ΔH > 0, ΔS < 0이면 모든 온도에서 비자발적). ③은 틀렸습니다(낮은 온도에서만 자발적일 수 있음). ④는 틀렸습니다(ΔH > 0, ΔS > 0이면 높은 온도에서 자발적일 수 있음).'
+  },
+  {
+    id:11, type:'mc', unit:'4단원', sub:'화학 반응 속도',
+    q:'어떤 반응 A + B → C에 대해 다음 실험 결과가 얻어졌다.\n\n실험 1: [A]=0.1 M, [B]=0.1 M → 반응 속도 = 2×10⁻³ M/s\n실험 2: [A]=0.2 M, [B]=0.1 M → 반응 속도 = 4×10⁻³ M/s\n실험 3: [A]=0.1 M, [B]=0.2 M → 반응 속도 = 2×10⁻³ M/s\n\n이 반응의 속도식은?',
+    choices:[
+      '① v = k[A][B]',
+      '② v = k[A]²[B]',
+      '③ v = k[A][B]²',
+      '④ v = k[A]',
+      '⑤ v = k[A]²'
+    ],
+    correct:3,
+    answerLine:'정답: ④  v = k[A]',
+    explanation:'실험 1→2 비교: [A]가 2배 증가할 때 속도도 2배 증가 → A에 대해 1차.\n실험 1→3 비교: [B]가 2배 증가해도 속도 변화 없음 → B에 대해 0차.\n따라서 반응 속도식은 v = k[A]입니다. 반응 차수는 화학 반응식의 계수와 무관하게 반드시 실험으로 결정해야 함을 보여주는 좋은 예입니다.'
+  },
+  {
+    id:12, type:'mc', unit:'4단원', sub:'일차 반응의 반감기',
+    q:'어떤 1차 반응의 반감기가 10분이다. 처음 농도가 0.8 M일 때, 30분 후 남은 반응물의 농도는?',
+    choices:[
+      '① 0.4 M',
+      '② 0.2 M',
+      '③ 0.1 M',
+      '④ 0.05 M',
+      '⑤ 0.025 M'
+    ],
+    correct:2,
+    answerLine:'정답: ③  0.1 M',
+    explanation:'1차 반응에서 반감기마다 농도가 절반씩 감소합니다.\n30분 = 반감기(10분) × 3회\n0.8 M → (1회, 10분 후) 0.4 M → (2회, 20분 후) 0.2 M → (3회, 30분 후) 0.1 M\n따라서 30분 후 농도는 0.1 M입니다.'
+  },
+  {
+    id:13, type:'mc', unit:'4단원', sub:'유효 충돌과 활성화 에너지',
+    q:'다음 중 반응 에너지 다이어그램에 대한 설명으로 옳지 않은 것은?',
+    choices:[
+      '① 정반응의 활성화 에너지는 전이 상태의 에너지와 반응물의 에너지 차이다.',
+      '② 발열 반응에서 생성물의 에너지는 반응물의 에너지보다 낮다.',
+      '③ 촉매를 사용하면 전이 상태의 에너지가 낮아진다.',
+      '④ 역반응의 활성화 에너지는 정반응의 활성화 에너지보다 항상 크다.',
+      '⑤ 반응 엔탈피(ΔH)는 반응물과 생성물의 에너지 차이다.'
+    ],
+    correct:3,
+    answerLine:'정답: ④',
+    explanation:'역반응의 활성화 에너지가 정반응보다 항상 크다는 것은 틀렸습니다. 발열 반응에서는 생성물의 에너지가 반응물보다 낮으므로, 역반응(흡열)의 활성화 에너지가 정반응(발열)의 활성화 에너지보다 큽니다. 반대로 흡열 반응에서는 정반응의 활성화 에너지가 더 큽니다. 즉, 발열·흡열 여부에 따라 달라지므로 "항상"이라는 표현은 옳지 않습니다.'
+  },
+  {
+    id:14, type:'mc', unit:'4단원', sub:'농도·온도·촉매에 따른 반응 속도',
+    q:'온도를 높였을 때 반응 속도가 빨라지는 이유를 유효 충돌의 관점에서 가장 올바르게 설명한 것은?',
+    choices:[
+      '① 온도가 높아지면 반응물 분자의 수가 증가하기 때문이다.',
+      '② 온도가 높아지면 활성화 에너지가 낮아지기 때문이다.',
+      '③ 온도가 높아지면 분자의 평균 운동 에너지가 증가하여 활성화 에너지 이상의 에너지를 가진 분자 수가 늘어나고, 충돌 횟수도 증가하기 때문이다.',
+      '④ 온도가 높아지면 반응물 분자의 농도가 증가하기 때문이다.',
+      '⑤ 온도가 높아지면 반응 엔탈피가 변하기 때문이다.'
+    ],
+    correct:2,
+    answerLine:'정답: ③',
+    explanation:'온도가 높아지면 분자의 평균 운동 에너지가 증가합니다. 이로 인해 활성화 에너지(반응이 일어나기 위한 최소 에너지) 이상의 에너지를 갖는 분자의 비율이 늘어나고, 단위 시간당 충돌 횟수도 증가합니다. 그 결과 유효 충돌(활성화 에너지 이상의 에너지를 가지고 적절한 방향으로 충돌하는 것)이 증가하여 반응 속도가 빨라집니다. 활성화 에너지 자체는 온도가 달라져도 변하지 않습니다.'
+  },
+  {
+    id:15, type:'mc', unit:'4단원', sub:'농도·온도·촉매에 따른 반응 속도',
+    q:'다음 중 촉매에 대한 설명으로 옳지 않은 것은?',
+    choices:[
+      '① 촉매는 반응 전후에 자신은 변하지 않는다.',
+      '② 정촉매는 활성화 에너지를 낮추어 반응 속도를 빠르게 한다.',
+      '③ 촉매를 사용해도 반응 엔탈피(ΔH)는 변하지 않는다.',
+      '④ 부촉매는 반응에 참여하지 않으므로 유효 충돌 횟수에 영향을 미치지 않는다.',
+      '⑤ 효소는 생체 내에서 작용하는 촉매의 일종이다.'
+    ],
+    correct:3,
+    answerLine:'정답: ④',
+    explanation:'부촉매는 반응에 참여하지 않는 것이 아니라, 활성화 에너지를 높이는 새로운 반응 경로를 제공하거나 반응 중간체를 안정화시켜 유효 충돌 횟수를 줄이는 방식으로 반응 속도를 느리게 합니다. 즉, 부촉매도 반응에 영향을 미칩니다. ①②③⑤는 모두 옳은 설명입니다.'
+  },
+  {
+    id:16, type:'mc', unit:'4단원', sub:'화학 반응 속도',
+    q:'반응 속도에 영향을 미치는 요인에 대한 설명으로 옳은 것을 모두 고른 것은?\n\nㄱ. 반응물의 농도가 클수록 단위 부피당 입자 수가 많아져 충돌 횟수가 증가한다.\nㄴ. 고체 반응물의 표면적이 클수록 반응 속도가 빨라진다.\nㄷ. 반응 속도 상수(k)는 온도가 일정하면 반응물의 농도와 무관하게 일정하다.',
+    choices:[
+      '① ㄱ만',
+      '② ㄴ만',
+      '③ ㄱ, ㄴ',
+      '④ ㄴ, ㄷ',
+      '⑤ ㄱ, ㄴ, ㄷ'
+    ],
+    correct:4,
+    answerLine:'정답: ⑤  ㄱ, ㄴ, ㄷ 모두 옳다.',
+    explanation:'ㄱ. 농도가 클수록 단위 부피당 입자 수가 많아져 충돌 횟수가 늘고 반응 속도가 빨라집니다 → 옳음.\nㄴ. 고체의 표면적이 클수록 반응물 입자가 접촉하는 면이 넓어져 충돌 횟수가 증가합니다 → 옳음.\nㄷ. 반응 속도 상수(k)는 온도에 의해 결정되는 상수로, 온도가 일정할 때 농도와 무관하게 일정합니다 → 옳음.\n따라서 ㄱ, ㄴ, ㄷ 모두 옳습니다.'
+  },
+
+  // ───── 단답형 (5문제) ─────
+  {
+    id:17, type:'sa', unit:'3단원', sub:'반응 경로와 반응 엔탈피',
+    q:'다음 두 반응의 엔탈피가 주어졌다.\n\n① H₂(g) + ½O₂(g) → H₂O(l)     ΔH₁ = −286 kJ/mol\n② H₂O(l) → H₂O(g)                 ΔH₂ = +44 kJ/mol\n\n헤스 법칙을 이용하여, H₂(g) + ½O₂(g) → H₂O(g) 의 ΔH를 구하시오.',
+    answer:'−242 kJ/mol',
+    keywords:['242','−242','-242'],
+    answerLine:'정답: ΔH = −242 kJ/mol',
+    explanation:'목표 반응은 반응 ①과 ②를 순서대로 더하면 됩니다.\n① + ②: H₂(g) + ½O₂(g) → H₂O(l) → H₂O(g)\n중간 생성물 H₂O(l)이 상쇄되어,\nH₂(g) + ½O₂(g) → H₂O(g)\nΔH = ΔH₁ + ΔH₂ = (−286) + (+44) = −242 kJ/mol'
+  },
+  {
+    id:18, type:'sa', unit:'3단원', sub:'화학 변화의 자발성',
+    q:'어떤 반응의 엔탈피 변화(ΔH)는 양(+)의 값이고, 엔트로피 변화(ΔS)도 양(+)의 값이다.\n이 반응은 어떤 온도 조건에서 자발적으로 일어나는지 쓰고, 그 이유를 엔탈피와 엔트로피의 관점에서 설명하시오.',
+    answer:'높은 온도에서 자발적',
+    keywords:['높은','고온'],
+    answerLine:'정답: 높은 온도에서 자발적으로 일어난다.',
+    explanation:'ΔH > 0은 흡열 반응으로, 엔탈피 측면에서는 자발성에 불리합니다. ΔS > 0은 엔트로피 증가로, 자발성에 유리합니다. 온도가 높아질수록 엔트로피 증가의 효과가 커져, 결국 엔트로피 요인이 엔탈피 요인을 극복할 수 있게 됩니다. 따라서 이 반응은 높은 온도에서 자발적으로 일어납니다.'
+  },
+  {
+    id:19, type:'sa', unit:'4단원', sub:'일차 반응의 반감기',
+    q:'어떤 1차 반응의 반감기가 20분이다. 초기 농도가 1.6 M일 때, 농도가 0.1 M이 되려면 몇 분이 걸리는지 구하시오.',
+    answer:'80분',
+    keywords:['80'],
+    answerLine:'정답: 80분',
+    explanation:'1차 반응에서 반감기마다 농도가 절반씩 감소합니다.\n1.6 M → (20분) → 0.8 M → (40분) → 0.4 M → (60분) → 0.2 M → (80분) → 0.1 M\n실제로는 4번의 반감기(= 80분)가 필요합니다.\n1.6 × (½)⁴ = 1.6/16 = 0.1 M → 20분 × 4 = 80분\n따라서 정답은 80분입니다.'
+  },
+  {
+    id:20, type:'sa', unit:'4단원', sub:'유효 충돌과 활성화 에너지',
+    q:'화학 반응이 일어나기 위한 유효 충돌의 조건 두 가지를 쓰시오.',
+    answer:'활성화 에너지 이상의 에너지 + 적절한 방향',
+    keywords:['활성화 에너지','방향'],
+    answerLine:'정답: ① 충돌 에너지가 활성화 에너지 이상일 것  ② 반응이 일어날 수 있는 적절한 방향으로 충돌할 것',
+    explanation:'모든 충돌이 반응으로 이어지는 것은 아닙니다. 유효 충돌이 되려면 두 가지 조건이 모두 충족되어야 합니다. 첫째, 충돌하는 분자들의 에너지가 활성화 에너지(반응이 일어나기 위한 최소 에너지) 이상이어야 합니다. 둘째, 분자들이 결합을 형성할 수 있는 적절한 방향으로 충돌해야 합니다. 이 두 조건이 모두 만족될 때만 반응이 일어납니다.'
+  },
+  {
+    id:21, type:'sa', unit:'4단원', sub:'농도·온도·촉매에 따른 반응 속도',
+    q:'정촉매와 부촉매가 반응 속도에 미치는 영향을 각각 활성화 에너지와 관련지어 설명하시오.',
+    answer:'정촉매: 활성화 에너지 낮춤 / 부촉매: 활성화 에너지 높임',
+    keywords:['정촉매','부촉매','낮','높'],
+    answerLine:'정답: 정촉매는 활성화 에너지를 낮춰 반응 속도를 빠르게 하고, 부촉매는 활성화 에너지를 높여 반응 속도를 느리게 한다.',
+    explanation:'정촉매는 활성화 에너지가 더 낮은 반응 경로를 제공하여, 활성화 에너지 이상의 에너지를 가진 분자의 비율을 늘립니다. 그 결과 유효 충돌 횟수가 증가하여 반응 속도가 빨라집니다. 반면 부촉매는 활성화 에너지가 더 높은 경로를 유도하거나 반응 중간체를 방해하여, 유효 충돌 횟수를 줄이고 반응 속도를 느리게 합니다. 두 경우 모두 반응 엔탈피(ΔH)는 변하지 않습니다.'
+  }
+];
+
+let questions = [];
+let currentIdx = 0;
+let answers = [];
+let answered = false;
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function startQuiz(){
+  questions = shuffle(ALL_QUESTIONS);
+  currentIdx = 0;
+  answers = [];
+  showScreen('quiz-screen');
+  renderQuestion();
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQuestion(){
+  const q = questions[currentIdx];
+  answered = false;
+  const total = questions.length;
+  const pct = Math.round((currentIdx/total)*100);
+  document.getElementById('progress-fill').style.width = pct+'%';
+
+  const typeMap = {ox:'O/X', mc:'객관식', sa:'단답형'};
+  const badgeClass = {ox:'badge-ox', mc:'badge-mc', sa:'badge-sa'};
+  const tb = document.getElementById('type-badge');
+  tb.textContent = typeMap[q.type];
+  tb.className = 'badge ' + badgeClass[q.type];
+
+  document.getElementById('q-num-label').textContent = (currentIdx+1)+' / '+total+'문제';
+  document.getElementById('unit-label').textContent = q.unit + ' · ' + q.sub;
+  document.getElementById('q-text').textContent = q.q;
+
+  document.getElementById('explanation').className = 'explanation';
+  document.getElementById('result-badge-wrap').innerHTML = '';
+  document.getElementById('btn-next').className = 'btn-next';
+  document.getElementById('btn-submit').className = 'btn-submit';
+
+  const body = document.getElementById('q-body');
+  body.innerHTML = '';
+
+  if(q.type === 'ox'){
+    const wrap = document.createElement('div');
+    wrap.className = 'ox-btns';
+    ['O','X'].forEach(v=>{
+      const btn = document.createElement('button');
+      btn.className = 'ox-btn';
+      btn.textContent = v;
+      btn.onclick = ()=>handleOX(v, btn);
+      wrap.appendChild(btn);
+    });
+    body.appendChild(wrap);
+  } else if(q.type === 'mc'){
+    const wrap = document.createElement('div');
+    wrap.className = 'choices';
+    q.choices.forEach((c,i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'choice';
+      btn.textContent = c;
+      btn.onclick = ()=>handleMC(i, btn, wrap);
+      wrap.appendChild(btn);
+    });
+    body.appendChild(wrap);
+  } else {
+    const wrap = document.createElement('div');
+    wrap.className = 'sa-wrap';
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = '답을 입력하세요';
+    inp.id = 'sa-input';
+    const hint = document.createElement('div');
+    hint.className = 'sa-hint';
+    hint.textContent = '핵심 개념을 포함하여 답하세요';
+    wrap.appendChild(inp);
+    wrap.appendChild(hint);
+    body.appendChild(wrap);
+
+    const subBtn = document.createElement('button');
+    subBtn.className = 'btn-submit show';
+    subBtn.id = 'sa-submit';
+    subBtn.textContent = '답안 제출';
+    subBtn.style.background='#1D9E75';
+    subBtn.style.color='#fff';
+    subBtn.style.border='none';
+    subBtn.style.borderRadius='var(--border-radius-md)';
+    subBtn.style.padding='12px';
+    subBtn.style.width='100%';
+    subBtn.style.fontSize='14px';
+    subBtn.style.fontWeight='500';
+    subBtn.style.cursor='pointer';
+    subBtn.style.marginBottom='1rem';
+    subBtn.onclick = ()=>handleSA();
+    body.appendChild(subBtn);
+
+    inp.addEventListener('keydown', e=>{if(e.key==='Enter') handleSA();});
+  }
+}
+
+function handleOX(val, clickedBtn){
+  if(answered) return;
+  answered = true;
+  const q = questions[currentIdx];
+  const isCorrect = val === q.correct;
+  const allBtns = clickedBtn.parentElement.querySelectorAll('.ox-btn');
+  allBtns.forEach(b=>{
+    b.disabled=true;
+    if(b.textContent === q.correct) b.classList.add('reveal-correct');
+  });
+  if(!isCorrect) clickedBtn.classList.add('wrong');
+  showFeedback(isCorrect, q);
+  answers.push({q, isCorrect, userAnswer: val});
+  showNextBtn();
+}
+
+function handleMC(idx, clickedBtn, wrap){
+  if(answered) return;
+  answered = true;
+  const q = questions[currentIdx];
+  const isCorrect = idx === q.correct;
+  wrap.querySelectorAll('.choice').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.correct) b.classList.add('reveal-correct');
+  });
+  if(!isCorrect) clickedBtn.classList.add('wrong');
+  showFeedback(isCorrect, q);
+  answers.push({q, isCorrect, userAnswer: q.choices[idx]});
+  showNextBtn();
+}
+
+function handleSA(){
+  if(answered) return;
+  const q = questions[currentIdx];
+  const inp = document.getElementById('sa-input');
+  if(!inp || inp.value.trim()==='') return;
+  answered = true;
+  const val = inp.value.trim();
+  const hit = q.keywords.some(kw=>val.includes(kw));
+  inp.disabled = true;
+  const saBtn = document.getElementById('sa-submit');
+  if(saBtn) saBtn.style.display='none';
+  showFeedback(hit, q);
+  answers.push({q, isCorrect: hit, userAnswer: val});
+  showNextBtn();
+}
+
+function showFeedback(isCorrect, q){
+  const ex = document.getElementById('explanation');
+  document.getElementById('ans-line').textContent = q.answerLine;
+  document.getElementById('ex-text').textContent = q.explanation;
+  ex.className = 'explanation show';
+  if(isCorrect) ex.style.borderLeftColor='#1D9E75';
+  else ex.style.borderLeftColor='#E24B4A';
+
+  const rb = document.getElementById('result-badge-wrap');
+  rb.innerHTML = isCorrect
+    ? '<div class="result-badge correct-badge"><i class="ti ti-check" aria-hidden="true"></i> 정답입니다!</div>'
+    : '<div class="result-badge wrong-badge"><i class="ti ti-x" aria-hidden="true"></i> 오답입니다</div>';
+}
+
+function showNextBtn(){
+  const isLast = currentIdx === questions.length - 1;
+  if(isLast){
+    document.getElementById('btn-submit').className = 'btn-submit show';
+  } else {
+    document.getElementById('btn-next').className = 'btn-next show';
+  }
+}
+
+function nextQ(){
+  currentIdx++;
+  renderQuestion();
+}
+
+function submitQuiz(){
+  const total = answers.length;
+  const correct = answers.filter(a=>a.isCorrect).length;
+  const pct = Math.round((correct/total)*100);
+
+  document.getElementById('score-pct').textContent = pct+'%';
+  document.getElementById('score-detail').textContent = total+'문제 중 '+correct+'문제 정답';
+
+  let msg = '';
+  if(pct>=90) msg='완벽해요! 3·4단원을 정말 잘 이해하고 있네요 🎉';
+  else if(pct>=70) msg='잘 하고 있어요! 틀린 부분을 다시 복습해봐요.';
+  else if(pct>=50) msg='조금 더 공부가 필요해요. 해설을 꼼꼼히 읽어봐요.';
+  else msg='개념을 다시 한번 정리해봐요. 할 수 있어요!';
+  document.getElementById('score-msg').textContent = msg;
+
+  const oxA = answers.filter(a=>a.q.type==='ox');
+  const mcA = answers.filter(a=>a.q.type==='mc');
+  const saA = answers.filter(a=>a.q.type==='sa');
+  const fmtStat = (arr)=>{
+    const c=arr.filter(a=>a.isCorrect).length;
+    return c+'/'+arr.length;
+  };
+  document.getElementById('stat-ox').textContent = fmtStat(oxA);
+  document.getElementById('stat-mc').textContent = fmtStat(mcA);
+  document.getElementById('stat-sa').textContent = fmtStat(saA);
+
+  const wrong = answers.filter(a=>!a.isCorrect);
+  const rl = document.getElementById('review-list');
+  if(wrong.length===0){
+    rl.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--color-text-secondary);font-size:14px">틀린 문제가 없어요! 완벽합니다 🎉</div>';
+  } else {
+    rl.innerHTML = wrong.map(a=>`
+      <div class="review-item">
+        <div class="ri-q">${a.q.q.replace(/\n/g,'<br>')}</div>
+        <div class="ri-ans">내 답: ${a.userAnswer || '(미입력)'}</div>
+        <div class="ri-correct">${a.q.answerLine}</div>
+        <div class="ri-ex">${a.q.explanation.replace(/\n/g,'<br>')}</div>
+      </div>
+    `).join('');
+  }
+
+  showScreen('result-screen');
+}
+
+function restartQuiz(){
+  startQuiz();
+}
+</script>
